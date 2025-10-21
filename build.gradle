@@ -4,13 +4,14 @@ plugins {
 
 // Change the values below this to your mods values
 // To change the project name, edit the settings.gradle file
+// For modID, Only use a-z,0-9
 
-project.ext.modID = "fair.examplemod" // The unique id of your mod. Must be all lowercase and cannot use special characters.
+project.ext.modID = "ixovo.examplemod" // The unique id of your mod. Must be all lowercase and cannot use special characters.
 project.ext.modName = "Example Mod" // The display name of your mod.
 project.ext.modVersion = "1.0" // Your current builds version. Must follow the xx.xx... format.
-project.ext.gameVersion = "0.31.0" // The target game version.
-project.ext.modDescription = "Just an example mod" // Short description of what your mod is.
-project.ext.author = "Fair" // Your name
+project.ext.gameVersion = "1.0.1" // The target game version.
+project.ext.modDescription = "Necesse Example Mod" // Short description of what your mod is.
+project.ext.author = "IXOVO" // Your name
 
 /**
  * When setting clientside to true, it means servers do not need this mod for clients to connect and vice versa.
@@ -28,7 +29,7 @@ project.ext.clientside = false
 //project.ext.modOptionalDependencies = ["optional.modid1", "optional.modid2"]
 
 // The path to the games install directory
-def gameDirectory = "C:/Program Files (x86)/Steam/steamapps/common/Necesse"
+def gameDirectory = "F:\\SteamLibrary\\steamapps\\common\\Necesse"
 
 // =================================================
 // ========== DO NOT EDIT BELOW THIS LINE ==========
@@ -40,8 +41,13 @@ def jarName = "${project.ext.modName.replace(" ", "")}-${project.ext.gameVersion
 group project.ext.modID
 version project.ext.modVersion
 
-setSourceCompatibility(JavaVersion.VERSION_1_8)
-setTargetCompatibility(JavaVersion.VERSION_1_8)
+setSourceCompatibility(JavaVersion.VERSION_17)
+setTargetCompatibility(JavaVersion.VERSION_17)
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-Xlint:-options'
+}
 
 repositories {
     mavenCentral()
@@ -52,7 +58,7 @@ configurations {
 }
 
 sourceSets.main.output.resourcesDir = file("build/mod/resources/")
-sourceSets.main.java.outputDir = file("build/mod/")
+sourceSets.main.java.destinationDirectory = file("build/mod/")
 sourceSets.main.compileClasspath += configurations.libDepends // Adds libDepends configuration to classpath
 def buildLocation = "build/jar/"
 
@@ -69,11 +75,11 @@ dependencies {
 
     // Add any third party library dependencies here. Remember to use libDepends, so that they will be added to your jar on build
     // These are some examples:
-//    libDepends group: 'com.google.guava', name: 'guava', version: '31.1-jre'
+//    libDepends group: 'com.google.guava', name: 'guava', version: '32.1.4-jre'
 //    libDepends files("path/to/library/jar.jar")
 }
 
-task createAppID {
+tasks.register('createAppID') {
     group "necesse"
     description "Creates steam_appid.txt file"
 
@@ -82,14 +88,14 @@ task createAppID {
     }
 }
 
-task createModInfoFile(type: JavaExec) {
+tasks.register('createModInfoFile', JavaExec) {
     group "necesse"
     description "Creates the mod info file"
 
     classpath = files(gameDirectory + "/Necesse.jar")
 
     main = "CreateModInfoFile"
-    args "-file", "${sourceSets.main.java.outputDir}/mod.info",
+    args "-file", "build/mod/mod.info",
             "-id", "${project.ext.modID}",
             "-name", "${project.ext.modName}",
             "-version", "${project.ext.modVersion}",
@@ -103,7 +109,7 @@ task createModInfoFile(type: JavaExec) {
 // Makes compiling also create mod info file
 classes.dependsOn("createModInfoFile")
 
-task runClient(type: JavaExec) {
+tasks.register('runClient', JavaExec) {
     group "necesse"
     description "Run client with current mod"
     dependsOn "buildModJar", "createAppID"
@@ -115,7 +121,7 @@ task runClient(type: JavaExec) {
     args "-dev", "-mod \"${buildLocation}\""
 }
 
-task runDevClient(type: JavaExec) {
+tasks.register('runDevClient', JavaExec) {
     group "necesse"
     description "Run client with current mod"
     dependsOn "buildModJar", "createAppID"
@@ -127,7 +133,7 @@ task runDevClient(type: JavaExec) {
     args "-dev 1", "-mod \"${buildLocation}\""
 }
 
-task runServer(type: JavaExec) {
+tasks.register('runServer', JavaExec) {
     group "necesse"
     description "Run server with current mod"
     dependsOn "buildModJar"
@@ -139,7 +145,7 @@ task runServer(type: JavaExec) {
     args "-mod \"${buildLocation}\""
 }
 
-task buildModJar(type: Jar) {
+tasks.register('buildModJar', Jar) {
     group "necesse"
     description "Generates the mod jar into the build folder"
     dependsOn "classes"
@@ -151,10 +157,10 @@ task buildModJar(type: Jar) {
     }
 
     // Add mod output
-    from sourceSets.main.java.outputDir
+    from "build/mod"
     // Add the dependencies
     from configurations.libDepends.collect { it.isDirectory() ? it : zipTree(it) }
 
-    archiveName "${jarName}.jar"
-    destinationDir file(buildLocation)
+    archiveFileName.set("${jarName}.jar")
+    destinationDirectory.set(file(buildLocation))
 }
