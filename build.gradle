@@ -6,12 +6,12 @@ plugins {
 // To change the project name, edit the settings.gradle file
 // For modID, Only use a-z,0-9
 
-project.ext.modID = "ixovo.examplemod" // The unique id of your mod. Must be all lowercase and cannot use special characters.
-project.ext.modName = "Example Mod" // The display name of your mod.
+project.ext.modID = "ixovo.rpg.admintools" // The unique id of your mod. Must be all lowercase and cannot use special characters.
+project.ext.modName = "RPGMod AdminTools" // The display name of your mod.
 project.ext.modVersion = "1.0" // Your current builds version. Must follow the xx.xx... format.
 project.ext.gameVersion = "1.0.1" // The target game version.
-project.ext.modDescription = "Necesse Example Mod" // Short description of what your mod is.
-project.ext.author = "IXOVO" // Your name
+project.ext.modDescription = "RPGMod Point Tools" // Short description of what your mod is.
+project.ext.author = "Shuazi" // Your name
 
 /**
  * When setting clientside to true, it means servers do not need this mod for clients to connect and vice versa.
